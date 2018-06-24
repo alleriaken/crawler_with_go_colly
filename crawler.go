@@ -1,12 +1,12 @@
 package main
 
 import (
-	"fmt"
-	"github.com/gocolly/colly"
-	"os"
 	"github.com/joho/godotenv"
-	"regexp"
 	"examword_crawler/models"
+	"os"
+	"github.com/gocolly/colly"
+	"fmt"
+	"regexp"
 	"net/http"
 	"io/ioutil"
 	"strings"
@@ -17,6 +17,13 @@ func main() {
 
 	godotenv.Load()
 	models.InitDB()
+
+	crawlWordExample()
+
+	defer models.CloseDB()
+}
+
+func crawlExamWord()  {
 	c := colly.NewCollector(colly.CacheDir("./.examword_cache"))
 	detailCollector := c.Clone()
 
@@ -65,12 +72,32 @@ func main() {
 	})
 
 	c.Visit("https://www.examword.com/ielts-list/4000-general-word-1")
-
-	fmt.Println(add(1,2))
-
-	defer models.CloseDB()
 }
 
-func add(x,y int) int {
-	return x + y
+func crawlWordExample() {
+	c := colly.NewCollector(colly.CacheDir("./.definition_cache"))
+
+	word_def_url := "http://thesaurus.yourdictionary.com/%s"
+
+	// Find and visit all links
+	c.OnHTML("ol[class='sense']", func(e *colly.HTMLElement) {
+		//e.Request.Visit(e.Attr("href"))
+		ele := e.DOM.Children().First()
+		for {
+			fmt.Println(ele.Size())
+			if ele.Size() == 0 {
+				break
+			}
+			child := ele.Children().First()
+			def := child.Text()
+			child = child.Next()
+			synonyms := child.Text()
+			fmt.Println(def)
+			fmt.Println(synonyms)
+			ele = ele.Next()
+		}
+
+	})
+
+	c.Visit(fmt.Sprintf(word_def_url, "quicken"))
 }

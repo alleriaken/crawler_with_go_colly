@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"fmt"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 var db *sql.DB
@@ -15,10 +16,10 @@ func InitDB() {
 	SQL_HOST := os.Getenv("SQL_HOST")
 	SQL_USERNAME := os.Getenv("SQL_USERNAME")
 	SQL_PASSWORD := os.Getenv("SQL_PASSWORD")
-	SQL_PORT := os.Getenv("SQL_PORT")
-	SQL_DBNAME := os.Getenv("SQL_DBNAME")
+	//SQL_PORT := os.Getenv("SQL_PORT")
+	SQL_DBNAME := os.Getenv("SQL_DB_NAME")
 
-	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@%s:%s/%s", SQL_USERNAME, SQL_PASSWORD, SQL_HOST, SQL_PORT, SQL_DBNAME))
+	db, err = sql.Open("mysql", fmt.Sprintf("%s:%s@%s/%s", SQL_USERNAME, SQL_PASSWORD, SQL_HOST, SQL_DBNAME))
 
 	if err != nil {
 		panic(err.Error()) // proper error handling instead of panic in your app
